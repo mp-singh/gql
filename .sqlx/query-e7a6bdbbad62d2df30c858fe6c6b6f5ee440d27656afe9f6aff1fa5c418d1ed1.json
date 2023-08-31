@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "\n                INSERT INTO phones (number, phone_type)\n                VALUES (?, ?)\n                RETURNING id",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Int64"
+      }
+    ],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "e7a6bdbbad62d2df30c858fe6c6b6f5ee440d27656afe9f6aff1fa5c418d1ed1"
+}

@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "\n                INSERT INTO user_colors (color_name)\n                VALUES (?)\n                RETURNING id",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Int64"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "5c88dd0242bccbcb93da8a934253ad0766dcb21efd003b8541bb604aa9dbf21f"
+}

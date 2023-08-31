@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "\n                INSERT INTO users (name, color_id, phone_id)\n                VALUES (?, ?, ?)\n                RETURNING id",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Int64"
+      }
+    ],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "e13849b51e31652ae5587e72e1abbbad784903f6326e357555e3b8fa49c6b31f"
+}
