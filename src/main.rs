@@ -16,6 +16,7 @@ use lazy_static::lazy_static;
 use mutation::Mutation;
 use query::Query;
 
+mod data_loaders;
 mod db;
 mod models;
 mod mutation;

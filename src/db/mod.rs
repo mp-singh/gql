@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use rusqlite::Result;
 use sqlx::{migrate::MigrateDatabase, Sqlite, SqlitePool};
 
@@ -6,6 +8,7 @@ use crate::models::{
     color_input::ColorInput,
     phone::{Phone, PhoneType},
     phone_input::PhoneInput,
+    sport::Sport,
     user::User,
 };
 
@@ -55,9 +58,9 @@ impl Database {
                 },
                 phone: Phone {
                     id: row.phone_id.unwrap() as i32,
-                    number: row.number.unwrap(),
+                    number: row.number,
                     phone_type: {
-                        let x: String = row.phone_type.unwrap();
+                        let x: String = row.phone_type;
                         PhoneType::from(x)
                     },
                 },
@@ -83,9 +86,9 @@ impl Database {
                 },
                 phone: Phone {
                     id: row.phone_id.unwrap() as i32,
-                    number: row.number.unwrap(),
+                    number: row.number,
                     phone_type: {
-                        let x: String = row.phone_type.unwrap();
+                        let x: String = row.phone_type;
                         PhoneType::from(x)
                     },
                 },
@@ -179,5 +182,21 @@ impl Database {
         };
         tx.commit().await.unwrap();
         Some(u.id as i32)
+    }
+
+    pub async fn get_sport_by_ids(&self, hashmap: &mut HashMap<i32, Sport>, ids: Vec<i32>) {
+        let db = &self.conn_ref;
+        sqlx::query!("SELECT id, name FROM sports WHERE id IN($1)", &[&ids])
+            .fetch_all(db)
+            .await
+            .unwrap()
+            .into_iter()
+            .for_each(|row| {
+                let sport = Sport {
+                    id: row.id as i32,
+                    name: row.name,
+                };
+                hashmap.insert(sport.id, sport);
+            });
     }
 }
