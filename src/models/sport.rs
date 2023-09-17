@@ -1,15 +1,17 @@
-#[derive(Debug, Clone)]
+use juniper::GraphQLObject;
+
+#[derive(Debug, Clone, GraphQLObject)]
 pub struct Sport {
     pub id: i32,
     pub name: String,
 }
 
-// #[juniper::graphql_object(Context = Context)]
+// #[graphql_object(context = Database)]
 // impl Sport {
 //     //  your resolvers
 
 //     // To call the dataloader
-//     pub async fn get_sport_by_ids(ctx: &Context, id: i32) -> Sport {
+//     async fn get_sport_by_ids(ctx: &Database, id: i32) -> Sport {
 //         ctx.sport_loader.load(id).await
 //     }
 // }

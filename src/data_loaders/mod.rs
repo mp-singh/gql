@@ -1,26 +1,45 @@
-// use std::collections::HashMap;
+use std::collections::HashMap;
 
-// use async_trait::async_trait;
-// use dataloader::{cached::Loader, BatchFn};
+use async_trait::async_trait;
+use dataloader::{cached::Loader, BatchFn};
 
-// use crate::models::sport::Sport;
+use crate::{models::sport::Sport, DATABASE};
+pub struct SportBatcher;
 
-// pub struct SportBatcher;
+#[async_trait]
+impl BatchFn<i32, Sport> for SportBatcher {
+    // A hashmap is used, as we need to return an array which maps each original key to a Sport.
+    async fn load(&mut self, keys: &[i32]) -> HashMap<i32, Sport> {
+        println!("load sport batch {keys:?}");
+        let mut sport_hashmap = HashMap::new();
+        get_sport_by_ids(&mut sport_hashmap, keys.to_vec()).await;
+        println!("sport_hashmap: {:?}", sport_hashmap);
+        sport_hashmap
+    }
+}
 
-// #[async_trait]
-// impl BatchFn<i32, Sport> for SportBatcher {
-//     // A hashmap is used, as we need to return an array which maps each original key to a Sport.
-//     async fn load(&self, keys: &[i32]) -> HashMap<i32, Sport> {
-//         println!("load sport batch {keys:?}");
-//         let mut sport_hashmap = HashMap::new();
-//         get_sport_by_ids(sef&mut sport_hashmap, keys.to_vec());
-//         sport_hashmap
-//     }
-// }
+pub type SportLoader = Loader<i32, Sport, SportBatcher>;
 
-// pub type SportLoader = Loader<i32, Sport, SportBatcher>;
+// To create a new loader
+pub fn get_loader() -> SportLoader {
+    Loader::new(SportBatcher).with_yield_count(100)
+}
 
-// // To create a new loader
-// pub fn get_loader() -> SportLoader {
-//     Loader::new(SportBatcher).with_yield_count(100)
-// }
+pub async fn get_sport_by_ids(hashmap: &mut HashMap<i32, Sport>, ids: Vec<i32>) {
+    let db = &DATABASE.get().await.conn_ref;
+    //conver vec i32 to u[8] for sqlite
+    let ids: Vec<u8> = ids.into_iter().map(|x| x as u8).collect();
+    sqlx::query!(r#"SELECT id, name FROM sports WHERE id IN ($1)"#, ids)
+        .fetch_all(db)
+        .await
+        .unwrap()
+        .into_iter()
+        .for_each(|row| {
+            let sport = Sport {
+                id: row.id as i32,
+                name: row.name,
+            };
+            println!("sport in db: {:?}", sport);
+            hashmap.insert(sport.id, sport);
+        });
+}

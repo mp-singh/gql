@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "SELECT id, name FROM sports WHERE id IN($1)",
+  "query": "SELECT id, name FROM sports WHERE id IN ($1)",
   "describe": {
     "columns": [
       {
@@ -22,5 +22,5 @@
       false
     ]
   },
-  "hash": "9af1f633fcc6718a5efab56e2505ce3ab996ca2f389d48824e86f6231dd8f1de"
+  "hash": "f9b12f8340338b460bf5b29de42cfc00c14217b96def6e7d9abc5e4aa11d3a7c"
 }

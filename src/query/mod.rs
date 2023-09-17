@@ -1,9 +1,8 @@
-// use async_graphql::graphql_object;
 use juniper::graphql_object;
 
 use crate::{
     db::Database,
-    models::{color::Color, user::User},
+    models::{color::Color, sport::Sport, user::User},
 };
 
 pub struct Query;
@@ -27,5 +26,13 @@ impl Query {
     }
     async fn colors(context: &Database) -> Vec<Color> {
         context.get_colors().await
+    }
+    async fn sport(
+        context: &Database,
+        #[graphql(description = "id of the user")] id: i32,
+    ) -> Sport {
+        // let mut ids = vec::Vec::new();
+        // ids.push(id);
+        context.sport_loader.load(id).await
     }
 }
