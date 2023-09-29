@@ -10,10 +10,8 @@ pub struct SportBatcher;
 impl BatchFn<i32, Sport> for SportBatcher {
     // A hashmap is used, as we need to return an array which maps each original key to a Sport.
     async fn load(&mut self, keys: &[i32]) -> HashMap<i32, Sport> {
-        println!("load sport batch {keys:?}");
         let mut sport_hashmap = HashMap::new();
         get_sport_by_ids(&mut sport_hashmap, keys.to_vec()).await;
-        println!("sport_hashmap: {:?}", sport_hashmap);
         sport_hashmap
     }
 }
@@ -27,8 +25,11 @@ pub fn get_loader() -> SportLoader {
 
 pub async fn get_sport_by_ids(hashmap: &mut HashMap<i32, Sport>, ids: Vec<i32>) {
     let db = &DATABASE.get().await.conn_ref;
-    //conver vec i32 to u[8] for sqlite
-    let ids: Vec<u8> = ids.into_iter().map(|x| x as u8).collect();
+    let ids: String = ids
+        .iter()
+        .map(|&x| x.to_string())
+        .collect::<Vec<String>>()
+        .join(",");
     sqlx::query!(r#"SELECT id, name FROM sports WHERE id IN ($1)"#, ids)
         .fetch_all(db)
         .await
@@ -39,7 +40,6 @@ pub async fn get_sport_by_ids(hashmap: &mut HashMap<i32, Sport>, ids: Vec<i32>) 
                 id: row.id as i32,
                 name: row.name,
             };
-            println!("sport in db: {:?}", sport);
             hashmap.insert(sport.id, sport);
         });
 }

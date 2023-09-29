@@ -30,9 +30,13 @@ impl Query {
     async fn sport(
         context: &Database,
         #[graphql(description = "id of the user")] id: i32,
-    ) -> Sport {
-        // let mut ids = vec::Vec::new();
-        // ids.push(id);
-        context.sport_loader.load(id).await
+    ) -> Option<Sport> {
+        match context.sport_loader.try_load(id).await {
+            Ok(sport) => Some(sport),
+            Err(_) => None,
+        }
+    }
+    async fn sports(context: &Database) -> Vec<Sport> {
+        context.get_sports().await
     }
 }

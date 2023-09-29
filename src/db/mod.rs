@@ -8,6 +8,7 @@ use crate::{
         color_input::ColorInput,
         phone::{Phone, PhoneType},
         phone_input::PhoneInput,
+        sport::Sport,
         user::User,
     },
 };
@@ -186,5 +187,18 @@ impl Database {
         };
         tx.commit().await.unwrap();
         Some(u.id as i32)
+    }
+    pub async fn get_sports(&self) -> Vec<Sport> {
+        let db = &self.conn_ref;
+        sqlx::query!(r#"SELECT id, name FROM sports"#)
+            .fetch_all(db)
+            .await
+            .unwrap()
+            .into_iter()
+            .map(|row| Sport {
+                id: row.id as i32,
+                name: row.name,
+            })
+            .collect()
     }
 }
