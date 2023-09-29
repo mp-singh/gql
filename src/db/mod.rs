@@ -1,12 +1,16 @@
 use rusqlite::Result;
 use sqlx::{migrate::MigrateDatabase, Sqlite, SqlitePool};
 
-use crate::models::{
-    color::Color,
-    color_input::ColorInput,
-    phone::{Phone, PhoneType},
-    phone_input::PhoneInput,
-    user::User,
+use crate::{
+    data_loaders::SportLoader,
+    models::{
+        color::Color,
+        color_input::ColorInput,
+        phone::{Phone, PhoneType},
+        phone_input::PhoneInput,
+        sport::Sport,
+        user::User,
+    },
 };
 
 const DB_URL: &str = "sqlite://sqlite.db";
@@ -14,10 +18,11 @@ const DB_URL: &str = "sqlite://sqlite.db";
 #[derive(Clone)]
 pub struct Database {
     pub conn_ref: SqlitePool,
+    pub sport_loader: SportLoader,
 }
 
 impl Database {
-    pub async fn new() -> Result<Database> {
+    pub async fn new(sport_loader: SportLoader) -> Result<Database> {
         if !Sqlite::database_exists(DB_URL).await.unwrap_or(false) {
             println!("Creating database {}", DB_URL);
             match Sqlite::create_database(DB_URL).await {
@@ -29,7 +34,10 @@ impl Database {
         };
 
         let db = SqlitePool::connect(DB_URL).await.unwrap();
-        Ok(Database { conn_ref: db })
+        Ok(Database {
+            conn_ref: db,
+            sport_loader,
+        })
     }
     pub async fn get_user(&self, id: &i32) -> Option<User> {
         let db = &self.conn_ref;
@@ -55,9 +63,9 @@ impl Database {
                 },
                 phone: Phone {
                     id: row.phone_id.unwrap() as i32,
-                    number: row.number.unwrap(),
+                    number: row.number,
                     phone_type: {
-                        let x: String = row.phone_type.unwrap();
+                        let x: String = row.phone_type;
                         PhoneType::from(x)
                     },
                 },
@@ -83,9 +91,9 @@ impl Database {
                 },
                 phone: Phone {
                     id: row.phone_id.unwrap() as i32,
-                    number: row.number.unwrap(),
+                    number: row.number,
                     phone_type: {
-                        let x: String = row.phone_type.unwrap();
+                        let x: String = row.phone_type;
                         PhoneType::from(x)
                     },
                 },
@@ -179,5 +187,18 @@ impl Database {
         };
         tx.commit().await.unwrap();
         Some(u.id as i32)
+    }
+    pub async fn get_sports(&self) -> Vec<Sport> {
+        let db = &self.conn_ref;
+        sqlx::query!(r#"SELECT id, name FROM sports"#)
+            .fetch_all(db)
+            .await
+            .unwrap()
+            .into_iter()
+            .map(|row| Sport {
+                id: row.id as i32,
+                name: row.name,
+            })
+            .collect()
     }
 }

@@ -16,6 +16,9 @@ use lazy_static::lazy_static;
 use mutation::Mutation;
 use query::Query;
 
+use crate::data_loaders::get_loader;
+
+mod data_loaders;
 mod db;
 mod models;
 mod mutation;
@@ -46,8 +49,9 @@ async fn graphql_route(
 
 lazy_static! {
     /// This is an example for using doc comment attributes
-    static ref DATABASE: AsyncOnce<Database> = AsyncOnce::new(async {
-        Database::new().await.unwrap()
+    pub static ref DATABASE: AsyncOnce<Database> = AsyncOnce::new(async {
+        let sport_loader = get_loader();
+        Database::new(sport_loader).await.unwrap()
     });
 }
 
