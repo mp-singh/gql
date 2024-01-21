@@ -1,0 +1,24 @@
+syntax = "proto3";
+package helloworld;
+
+service Greeter {
+    rpc SayHello (HelloRequest) returns (HelloReply);
+    rpc SayHelloAgain (HelloRequest) returns (ResponseAgain);
+}
+
+message HelloRequest {
+    string name = 1;
+}
+
+message HelloReply {
+    string message = 1;
+}
+
+message HelloAgain {
+    string name = 1;
+}
+
+message ResponseAgain {
+    string message = 1;
+    int32 response_time = 2;
+}

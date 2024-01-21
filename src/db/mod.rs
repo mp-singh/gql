@@ -154,7 +154,8 @@ impl Database {
             color.name
         )
         .fetch_one(&mut *tx)
-        .await else {
+        .await
+        else {
             tx.rollback().await.unwrap();
             return None;
         };
@@ -167,10 +168,11 @@ impl Database {
             phone_type,
         )
         .fetch_one(&mut *tx)
-        .await else {
+        .await
+        else {
             tx.rollback().await.unwrap();
-            return None
-         };
+            return None;
+        };
         let Ok(u) = sqlx::query!(
             r#"
                 INSERT INTO users (name, color_id, phone_id)
@@ -181,9 +183,10 @@ impl Database {
             p.id,
         )
         .fetch_one(&mut *tx)
-        .await else {
+        .await
+        else {
             tx.rollback().await.unwrap();
-            return None
+            return None;
         };
         tx.commit().await.unwrap();
         Some(u.id as i32)

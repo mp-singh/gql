@@ -5,6 +5,10 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[[bin]]
+name = "helloworld-server"
+path = "src/server.rs"
+
 [dependencies]
 actix-cors = "0.6"
 actix-rt = "2.9"
@@ -18,8 +22,25 @@ juniper = { version = "0.15", features = ["expose-test-schema"] }
 juniper_actix = "0.4.0"
 lazy_static = "1.4.0"
 rand = "0.8"
-rusqlite = "0.29"
+rusqlite = "0.30"
 serde = "1.0"
 serde_json = "1.0"
 sqlx = { version = "0.7.1", features = ["runtime-tokio-native-tls", "sqlite"]}
-tokio ={ version = "1.29", features = ["macros"]} 
+tokio ={ version = "1.29", features = ["full"]} 
+tonic = "0.10"
+prost = "0.12"
+
+argon2 = "0.5"
+jsonwebtoken = "9"
+chrono = "0.4"
+
+#opentelemetry
+opentelemetry = { version = "0.20", features = ["trace", "logs"] }
+opentelemetry-stdout = { version = "0.1", features = ["trace", "logs"] }
+
+opentelemetry_sdk = { version = "0.20", features = ["logs"] }
+opentelemetry-appender-log = { version = "0.1", default-features = false}
+log = {version = "0.4.17"}
+
+[build-dependencies]
+tonic-build = "0.10"
